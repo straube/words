@@ -68,9 +68,11 @@
         'bridge',
     ];
 
-    let currentWord;
+    let currentWord = undefined;
 
-    let voice;
+    let voice = undefined;
+
+    let pickedWords = [];
 
     function getImageUrl(word) {
         return `${sourceUrl}/${imageSize}x${imageSize}?${word}`;
@@ -95,8 +97,13 @@
 
     function nextWord() {
         let newWord;
-        while ((newWord = getRandomWord()) === currentWord);
+        if (pickedWords.length === words.length) {
+            sayWord('Yay! You finished the game! See you next time!');
+            return;
+        }
+        while (pickedWords.indexOf(newWord = getRandomWord()) !== -1);
         currentWord = newWord;
+        pickedWords.push(currentWord);
         loadImages().then(sayCurrentWord).catch((e) => {
             console.error(e);
         });
