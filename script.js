@@ -147,15 +147,13 @@
 
     function checkWord(event) {
         const correct = event.target.dataset.word === currentWord;
-        const result = document.getElementById('result');
         if (correct) {
-            result.innerHTML = 'Good job!';
+            sayWord('Good job!');
             window.setTimeout(() => {
-                result.innerHTML = '';
                 nextWord();
-            }, 5000);
+            });
         } else {
-            result.innerHTML = 'Oops! Try again.';
+            sayWord('Oops! Try again.');
         }
     }
 
