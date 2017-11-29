@@ -18,7 +18,7 @@ right image associated to that word.
 ### 0.0.1
 
 * First release. A very simple "game" where you hear a word and choose between
-    3 pictures wich one represents best that word.
+    3 pictures which one represents best that word.
 
 [1]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API#Speech_synthesis
 [2]: http://getbootstrap.com/
