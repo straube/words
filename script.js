@@ -68,6 +68,8 @@
         'bridge',
     ];
 
+    let loading = true;
+
     let currentWord = undefined;
 
     let voice = undefined;
@@ -81,8 +83,8 @@
     function sayWord(word) {
         const utter = new SpeechSynthesisUtterance(word);
         utter.voice = voice;
-        utter.pitch = 0.9;
-        utter.rate = 0.7;
+        utter.pitch = 0.8;
+        utter.rate = 0.6;
         synth.speak(utter);
     }
 
@@ -101,12 +103,11 @@
             sayWord('Yay! You finished the game! See you next time!');
             return;
         }
+        loading = true;
         while (pickedWords.indexOf(newWord = getRandomWord()) !== -1);
         currentWord = newWord;
         pickedWords.push(currentWord);
-        loadImages().then(sayCurrentWord).catch((e) => {
-            console.error(e);
-        });
+        loadImages().then(sayCurrentWord).catch(console.error);
     }
 
     function loadImages() {
@@ -118,20 +119,25 @@
         }
         shuffle(imageWords);
         return new Promise((resolve, reject) => {
-            let loaded = 0;
-            for (let i = imageWords.length - 1; i >= 0; i--) {
-                const word = imageWords[i];
-                const image = document.getElementById(`image_${i}`);
-                image.src = pixel;
-                window.setTimeout(() => {
-                    image.addEventListener('load', () => {
-                        if (++loaded === imageWords.length) {
-                            return resolve();
-                        }
-                    }, false);
-                    image.src = getImageUrl(word);
-                    image.dataset.word = word;
-                }, 100);
+            try {
+                let loaded = 0;
+                for (let i = imageWords.length - 1; i >= 0; i--) {
+                    const word = imageWords[i];
+                    const image = document.getElementById(`image_${i}`);
+                    image.src = pixel;
+                    window.setTimeout(() => {
+                        image.addEventListener('load', () => {
+                            if (++loaded === imageWords.length) {
+                                loading = false;
+                                return resolve();
+                            }
+                        }, false);
+                        image.src = getImageUrl(word);
+                        image.dataset.word = word;
+                    }, 100);
+                }
+            } catch (e) {
+                return reject(e);
             }
         });
     }
@@ -146,6 +152,9 @@
     }
 
     function checkWord(event) {
+        if (loading) {
+            return;
+        }
         const correct = event.target.dataset.word === currentWord;
         if (correct) {
             sayWord('Good job!');
@@ -157,7 +166,13 @@
         }
     }
 
+    function showForm() {
+        document.getElementById('start').classList.add('d-none');
+        document.querySelector('form').classList.remove('d-none');
+    }
+
     function init() {
+        showForm();
         const voices = synth.getVoices();
         if (!voices || voices.length === 0) {
             throw new Error('No voice is available.');
@@ -174,6 +189,11 @@
         nextWord();
     }
 
+    if (typeof synth === 'undefined' || synth.onvoiceschanged === undefined) {
+        window.alert('It looks like this browser does not support the Speech Synthesis API');
+        return;
+    }
+
     document.getElementById('repeat').addEventListener('click', sayCurrentWord, false);
 
     const images = document.getElementsByTagName('img');
@@ -181,8 +201,6 @@
         images[i].addEventListener('click', checkWord, false);
     }
 
-    if (typeof synth !== 'undefined' && synth.onvoiceschanged !== undefined) {
-        speechSynthesis.addEventListener('voiceschanged', init, false);
-    }
+    document.getElementById('start').addEventListener('click', init, false);
 
 })();

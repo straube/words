@@ -8,6 +8,14 @@ right image associated to that word.
 
 ## Changelog
 
+### 0.1.0
+
+* Fixed clicking on image while it's loading.
+* Added heading to page.
+* Improved speech tone.
+* Added "Start" button handle speechSynthesis.speak() without user activation.
+* Updated Bootstrap version.
+
 ### 0.0.2
 
 * Minor design improvements (added [Bootstrap][2] stylesheet).
