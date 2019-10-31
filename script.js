@@ -157,7 +157,13 @@
         }
     }
 
+    function showForm() {
+        document.getElementById('start').classList.add('d-none');
+        document.querySelector('form').classList.remove('d-none');
+    }
+
     function init() {
+        showForm();
         const voices = synth.getVoices();
         if (!voices || voices.length === 0) {
             throw new Error('No voice is available.');
@@ -174,6 +180,11 @@
         nextWord();
     }
 
+    if (typeof synth === 'undefined' || synth.onvoiceschanged === undefined) {
+        window.alert('It looks like this browser does not support the Speech Synthesis API');
+        return;
+    }
+
     document.getElementById('repeat').addEventListener('click', sayCurrentWord, false);
 
     const images = document.getElementsByTagName('img');
@@ -181,8 +192,6 @@
         images[i].addEventListener('click', checkWord, false);
     }
 
-    if (typeof synth !== 'undefined' && synth.onvoiceschanged !== undefined) {
-        speechSynthesis.addEventListener('voiceschanged', init, false);
-    }
+    document.getElementById('start').addEventListener('click', init, false);
 
 })();
