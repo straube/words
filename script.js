@@ -81,8 +81,8 @@
     function sayWord(word) {
         const utter = new SpeechSynthesisUtterance(word);
         utter.voice = voice;
-        utter.pitch = 0.9;
-        utter.rate = 0.7;
+        utter.pitch = 0.8;
+        utter.rate = 0.6;
         synth.speak(utter);
     }
 
