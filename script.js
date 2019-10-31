@@ -68,6 +68,8 @@
         'bridge',
     ];
 
+    let loading = true;
+
     let currentWord = undefined;
 
     let voice = undefined;
@@ -101,12 +103,11 @@
             sayWord('Yay! You finished the game! See you next time!');
             return;
         }
+        loading = true;
         while (pickedWords.indexOf(newWord = getRandomWord()) !== -1);
         currentWord = newWord;
         pickedWords.push(currentWord);
-        loadImages().then(sayCurrentWord).catch((e) => {
-            console.error(e);
-        });
+        loadImages().then(sayCurrentWord).catch(console.error);
     }
 
     function loadImages() {
@@ -118,20 +119,25 @@
         }
         shuffle(imageWords);
         return new Promise((resolve, reject) => {
-            let loaded = 0;
-            for (let i = imageWords.length - 1; i >= 0; i--) {
-                const word = imageWords[i];
-                const image = document.getElementById(`image_${i}`);
-                image.src = pixel;
-                window.setTimeout(() => {
-                    image.addEventListener('load', () => {
-                        if (++loaded === imageWords.length) {
-                            return resolve();
-                        }
-                    }, false);
-                    image.src = getImageUrl(word);
-                    image.dataset.word = word;
-                }, 100);
+            try {
+                let loaded = 0;
+                for (let i = imageWords.length - 1; i >= 0; i--) {
+                    const word = imageWords[i];
+                    const image = document.getElementById(`image_${i}`);
+                    image.src = pixel;
+                    window.setTimeout(() => {
+                        image.addEventListener('load', () => {
+                            if (++loaded === imageWords.length) {
+                                loading = false;
+                                return resolve();
+                            }
+                        }, false);
+                        image.src = getImageUrl(word);
+                        image.dataset.word = word;
+                    }, 100);
+                }
+            } catch (e) {
+                return reject(e);
             }
         });
     }
@@ -146,6 +152,9 @@
     }
 
     function checkWord(event) {
+        if (loading) {
+            return;
+        }
         const correct = event.target.dataset.word === currentWord;
         if (correct) {
             sayWord('Good job!');
